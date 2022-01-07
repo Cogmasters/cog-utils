@@ -18,7 +18,6 @@ TEST_LOGCONF := test-logconf
 TEST_NTL     := test-ntl
 
 TEST_SPECS   := test-ns \
-                test-json-struct \
                 test-spec
 
 EXES := $(TEST_JSON) $(TEST_LOGCONF) $(TEST_NTL)
