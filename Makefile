@@ -12,7 +12,7 @@ SRC_C99 := cog-utils.c \
            log.c \
            logconf.c
 
-SRC_NOSTD := json-struct.c
+SRC_NOSTD := specs-gen.c
 
 OBJS_C89   := $(SRC_C89:%.c=$(OBJDIR)/%.o)
 OBJS_C99   := $(SRC_C99:%.c=$(OBJDIR)/%.o)

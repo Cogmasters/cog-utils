@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 #include "json-actor.h"
-#include "cee-utils.h"
+#include "cog-utils.h"
 #include "debug.h"
 
 /* generated code dependencies */
@@ -17,7 +17,7 @@ static const char SPECS_DEPS_H[] = "#include <stdbool.h>\n"
                                    "#include <strings.h>\n"
                                    "#include \"json-actor.h\"\n"
                                    "#include \"json-actor-boxed.h\"\n"
-                                   "#include \"cee-utils.h\"\n";
+                                   "#include \"cog-utils.h\"\n";
 
 /*
  *
@@ -115,8 +115,8 @@ init_converters(void)
   converters[0]->input_type = "char*";
   converters[0]->output_type = "u64_unix_ms_t";
   converters[0]->free = NULL;
-  converters[0]->extractor = "cee_iso8601_to_unix_ms";
-  converters[0]->injector = "cee_unix_ms_to_iso8601";
+  converters[0]->extractor = "cog_iso8601_to_unix_ms";
+  converters[0]->injector = "cog_unix_ms_to_iso8601";
   converters[0]->extractor_addrof = "&";
   converters[0]->injector_addrof = "&";
   converters[0]->converted_builtin_type = "uint64_t";
@@ -128,8 +128,8 @@ init_converters(void)
   converters[1]->input_type = "char*";
   converters[1]->output_type = "u64_snowflake_t";
   converters[1]->free = NULL;
-  converters[1]->extractor = "cee_strtou64";
-  converters[1]->injector = "cee_u64tostr";
+  converters[1]->extractor = "cog_strtou64";
+  converters[1]->injector = "cog_u64tostr";
   converters[1]->extractor_addrof = "&";
   converters[1]->injector_addrof = "&";
   converters[1]->converted_builtin_type = "uint64_t";
@@ -141,7 +141,7 @@ init_converters(void)
   converters[2]->input_type = "char*";
   converters[2]->output_type = "json_char_t*";
   converters[2]->free = "free";
-  converters[2]->extractor = "cee_strndup";
+  converters[2]->extractor = "cog_strndup";
   converters[2]->injector = "s";
   converters[2]->extractor_addrof = "&";
   converters[2]->injector_addrof = "";
@@ -563,14 +563,14 @@ field_from_json(char *json, size_t size, void *x)
     }
     else { /* we will convert this to actual type later */
       p->inject_condition.opcode = TYPE_RAW_JSON;
-      cee_strndup(t_inject_if_not.start, t_inject_if_not.size,
+      cog_strndup(t_inject_if_not.start, t_inject_if_not.size,
                   &p->inject_condition.token);
     }
   }
 
   if (t_default_value.size != 0) {
     p->type.default_value.opcode = TYPE_RAW_JSON;
-    cee_strndup(t_default_value.start, t_default_value.size,
+    cog_strndup(t_default_value.start, t_default_value.size,
                 &p->type.default_value.token);
   }
 }
@@ -1256,7 +1256,7 @@ to_action(struct jc_field *f, struct action *act)
       tok += strlen("enum");
       while (*tok && isspace(*tok))
         tok++;
-      cee_strndup(tok, strlen(tok), &act->fun_prefix);
+      cog_strndup(tok, strlen(tok), &act->fun_prefix);
       act->fun_prefix = to_C_name(act->fun_prefix);
     }
     else {
@@ -1273,7 +1273,7 @@ to_action(struct jc_field *f, struct action *act)
       tok += strlen("struct");
       while (*tok && isspace(*tok))
         tok++;
-      cee_strndup(tok, strlen(tok), &act->fun_prefix);
+      cog_strndup(tok, strlen(tok), &act->fun_prefix);
       is_user_defined_type = true;
       act->fun_prefix = to_C_name(act->fun_prefix);
     }
@@ -1293,10 +1293,10 @@ to_action(struct jc_field *f, struct action *act)
       }
       else {
         if (is_user_defined_type) {
-          cee_asprintf(&act->injector, "%s_to_json", act->fun_prefix);
-          cee_asprintf(&act->extractor, "%s_from_json_p", act->fun_prefix);
-          cee_asprintf(&act->alloc, "%s_init", act->fun_prefix);
-          cee_asprintf(&act->free, "%s_cleanup", act->fun_prefix);
+          cog_asprintf(&act->injector, "%s_to_json", act->fun_prefix);
+          cog_asprintf(&act->extractor, "%s_from_json_p", act->fun_prefix);
+          cog_asprintf(&act->alloc, "%s_init", act->fun_prefix);
+          cog_asprintf(&act->free, "%s_cleanup", act->fun_prefix);
 
           act->extract_arg_decor = "&";
           act->inject_arg_decor = "";
@@ -1324,13 +1324,13 @@ to_action(struct jc_field *f, struct action *act)
     act->extract_is_user_def = true;
     act->is_actor_alloc = true;
     if (to_builtin_action(f, act)) {
-      cee_asprintf(&act->extractor, "%s_list_from_json", act->fun_prefix);
-      cee_asprintf(&act->injector, "%s_list_to_json", act->fun_prefix);
+      cog_asprintf(&act->extractor, "%s_list_from_json", act->fun_prefix);
+      cog_asprintf(&act->injector, "%s_list_to_json", act->fun_prefix);
     }
     else {
-      cee_asprintf(&act->extractor, "%s_list_from_json", act->fun_prefix);
-      cee_asprintf(&act->injector, "%s_list_to_json", act->fun_prefix);
-      cee_asprintf(&act->free, "%s_list_free", act->fun_prefix);
+      cog_asprintf(&act->extractor, "%s_list_from_json", act->fun_prefix);
+      cog_asprintf(&act->injector, "%s_list_to_json", act->fun_prefix);
+      cog_asprintf(&act->free, "%s_list_free", act->fun_prefix);
     }
     break;
   case DEC_ARRAY:
@@ -2257,7 +2257,7 @@ gen_definition_list(char *folder,
 
     len = snprintf(buf, sizeof(buf), "%s/%s%s", folder, f,
                    get_file_suffix(global_option.type));
-    cee_strndup(buf, len, &fname);
+    cog_strndup(buf, len, &fname);
 
     gen_definition(fname, "w", opt, d);
   }
