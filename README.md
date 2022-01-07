@@ -1,16 +1,15 @@
-# cee-utils
+# cog-utils
 
-The code are supposed to be dowloaded to our source tree to be used. 
+This repository is intended to be downloaded at compile time by a project that uses it.
 
 ```
-wget https://raw.githubusercontent.com/cee-studio/cee-utils/master/scripts/get-cee-utils.sh 
-./get-cee-utils.sh
+git clone https://github.com/cogmasters/cog-utils
 ```
 
 
-many GPL codec
+Various cryptographic utilities (targeting AVR MCUs):
 https://github.com/cantora/avr-crypto-lib
 
 
-single file C unit test
+A really simple C unit test framework:
 https://github.com/silentbicycle/greatest
