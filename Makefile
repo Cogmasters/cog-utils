@@ -4,10 +4,9 @@ OBJDIR     := obj
 TEST_DIR   := test
 
 SRC_C89 := ntl.c \
-           json-string.c \
-           json-parser.c 
+           json-string.c
 
-SRC_C99 := cee-utils.c \
+SRC_C99 := cog-utils.c \
            json-actor-boxed.c \
            json-actor.c \
            log.c \

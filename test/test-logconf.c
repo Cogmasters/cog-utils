@@ -1,7 +1,6 @@
 #include <string.h>
 
 #include "logconf.h"
-#include "cee-utils.h"
 
 #define CONFIG_FILE "test-logconf.json"
 

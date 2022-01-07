@@ -66,7 +66,7 @@
 
 #include "json-actor.h"
 
-#include "cee-utils.h"
+#include "cog-utils.h"
 #include "ntl.h"
 #include "debug.h"
 
@@ -1419,30 +1419,30 @@ inject_format_string(char *pos,
 {
   char *p = NULL;
   char *format;
-  cee_strndup(sbuf->start, sbuf->size, &format);
+  cog_strndup(sbuf->start, sbuf->size, &format);
   switch (n) {
   case 1:
-    cee_asprintf(&p, format, args[0]._);
+    cog_asprintf(&p, format, args[0]._);
     break;
   case 2:
-    cee_asprintf(&p, format, args[0]._, args[1]._);
+    cog_asprintf(&p, format, args[0]._, args[1]._);
     break;
   case 3:
-    cee_asprintf(&p, format, args[0]._, args[1]._, args[2]._);
+    cog_asprintf(&p, format, args[0]._, args[1]._, args[2]._);
     break;
   case 4:
-    cee_asprintf(&p, format, args[0]._, args[1]._, args[2]._, args[3]._);
+    cog_asprintf(&p, format, args[0]._, args[1]._, args[2]._, args[3]._);
     break;
   case 5:
-    cee_asprintf(&p, format, args[0]._, args[1]._, args[2]._, args[3]._,
+    cog_asprintf(&p, format, args[0]._, args[1]._, args[2]._, args[3]._,
                  args[4]._);
     break;
   case 6:
-    cee_asprintf(&p, format, args[0]._, args[1]._, args[2]._, args[3]._,
+    cog_asprintf(&p, format, args[0]._, args[1]._, args[2]._, args[3]._,
                  args[4]._, args[5]._);
     break;
   case 7:
-    cee_asprintf(&p, format, args[0]._, args[1]._, args[2]._, args[3]._,
+    cog_asprintf(&p, format, args[0]._, args[1]._, args[2]._, args[3]._,
                  args[4]._, args[5]._, args[6]._);
     break;
   default:
@@ -1832,7 +1832,7 @@ copy_over_string(size_t *new_size, char *str, size_t len)
     ret = snprintf(buf, sizeof(buf),
                    "cannot unescape an ill-formed string %.*s", (int)len, str);
 
-    *new_size = cee_strndup(buf, ret, &p) + 1;
+    *new_size = cog_strndup(buf, ret, &p) + 1;
     return p;
   }
 }
@@ -2261,7 +2261,7 @@ extract_object_value(struct composite_value *cv,
       else if (p->path.is_star) {
         size_t ksize = tokens[key_idx].end - tokens[key_idx].start;
 
-        cee_strndup(json + tokens[key_idx].start, ksize,
+        cog_strndup(json + tokens[key_idx].start, ksize,
                     (char **)(p->value._.action.key));
         ret += extract_access_path(val_idx, p, p->path.next, info);
       }

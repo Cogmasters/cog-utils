@@ -3,7 +3,6 @@
 #include <string.h>
 #include <assert.h>
 
-#include "cee-utils.h"
 #include "json-actor.h"
 #include "greatest.h"
 

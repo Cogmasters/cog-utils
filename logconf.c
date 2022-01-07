@@ -9,7 +9,7 @@
 
 #include "logconf.h"
 
-#include "cee-utils.h"
+#include "cog-utils.h"
 #include "json-actor.h"
 #include "json-actor-boxed.h" /* ja_str */
 
@@ -92,7 +92,7 @@ logconf_http(struct logconf *conf,
   pthread_mutex_lock(&g_lock);
   size_t counter = ++g_counter;
   pthread_mutex_unlock(&g_lock);
-  uint64_t tstamp_ms = cee_timestamp_ms();
+  uint64_t tstamp_ms = cog_timestamp_ms();
 
   if (!conf || !conf->http || !conf->http->f) goto _end;
 
@@ -106,7 +106,7 @@ logconf_http(struct logconf *conf,
 
   /* Get timestamp string */
   char timestr[64];
-  cee_unix_ms_to_iso8601(timestr, sizeof(timestr), &tstamp_ms);
+  cog_unix_ms_to_iso8601(timestr, sizeof(timestr), &tstamp_ms);
 
   /* Print to output */
   fprintf(conf->http->f,
@@ -154,7 +154,7 @@ logconf_setup(struct logconf *conf, const char id[], FILE *fp)
     } http;
   } l = { 0 };
 
-  conf->file.start = cee_load_whole_file_fp(fp, &conf->file.size);
+  conf->file.start = cog_load_whole_file_fp(fp, &conf->file.size);
   json_extract(conf->file.start, conf->file.size,
                "(logging):{"
                "(level):.*s,"

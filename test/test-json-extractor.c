@@ -4,7 +4,7 @@
 #include <limits.h>
 #include <assert.h>
 
-#include "cee-utils.h"
+#include "cog-utils.h"
 #include "json-actor.h"
 
 int main()
@@ -166,11 +166,11 @@ int main()
   json = "{\n"
     "\t\"ref\":\"refs/heads/master\",\n"
     "\t\"node_id\":\"MDM6UmVmMjgxNTM2NjcwOnJlZnMvaGVhZHMvbWFzdGVy\",\n"
-    "\t\"url\":\"https://api.github.com/repos/cee-studio/orca/git/refs/heads/master\",\n"
+    "\t\"url\":\"https://api.github.com/repos/Cogmasters/concord/git/refs/heads/master\",\n"
     "\t\"object\":{\n"
     "\t\t\"sha\":\"37391fb67135651f83e586c49ec7a96e773ba733\",\n"
     "\t\t\"type\":\"commit\",\n"
-    "\t\t\"url\":\"https://api.github.com/repos/cee-studio/orca/git/commits/37391fb67135651f83e586c49ec7a96e773ba733\"\n"
+    "\t\t\"url\":\"https://api.github.com/repos/Cogmasters/concord/git/commits/37391fb67135651f83e586c49ec7a96e773ba733\"\n"
     "\t}\n"
     "}";
   char * p;

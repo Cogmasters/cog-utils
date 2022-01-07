@@ -11,7 +11,6 @@ TEST_JSON    := test-json-extract-inject \
                 test-json-extractor \
                 test-json-injector-1 \
                 test-json-injector \
-                test-json-parser \
                 test-json-string
 
 TEST_LOGCONF := test-logconf
