@@ -1,42 +1,27 @@
-# This Makefile assumes the top folder has been built
+OBJS=specs-gen.o test-json-actor.o test-json-extract-inject.o test-json-extractor.o \
+test-json-injector-1.o test-json-injector.o test-json-string.o test-logconf.o \
+test-ns.o test-ntl.o test-spec.o
 
-TOP = ..
-CC ?= gcc
+PROGS=specs-gen test-json-actor test-json-extract-inject test-json-extractor \
+test-json-injector-1 test-json-injector test-json-string test-logconf \
+test-ns test-ntl test-spec
 
-OBJDIR     := $(TOP)/obj
+CC=cc
 
-OBJS   ?= $(wildcard $(OBJDIR)/*.o)
+.SUFFIXES: .c .o
 
-TEST_JSON    := test-json-extract-inject \
-                test-json-extractor \
-                test-json-injector-1 \
-                test-json-injector \
-                test-json-string
+.c.o:
+	$(CC) -I.. -c $<
 
-TEST_LOGCONF := test-logconf
-
-TEST_NTL     := test-ntl
-
-TEST_SPECS   := test-ns \
-                test-spec
-
-EXES := $(TEST_JSON) $(TEST_LOGCONF) $(TEST_NTL)
-
-CFLAGS  += -I$(TOP) -O0 -g -pthread -Wall
-LDFLAGS += -lm
-
-all: $(EXES)
-
-$(EXES): %: %.c $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
-
-
-echo:
-	@ echo -e 'CC: $(CC)\n'
-	@ echo -e 'EXES: $(EXES)\n'
-	@ echo -e 'OBJS: $(OBJS)\n'
-
-clean:
-	rm -rf $(EXES)
-
-.PHONY: all echo clean
+$(PROGS): $(OBJS)
+	$(CC) -L.. -lcog-utils -o specs-gen specs-gen.o
+	$(CC) -L.. -lcog-utils -o test-json-actor test-json-actor.o
+	$(CC) -L.. -lcog-utils -o test-json-extract-inject test-json-extract-inject.o
+	$(CC) -L.. -lcog-utils -o test-json-extractor test-json-extractor.o
+	$(CC) -L.. -lcog-utils -o test-json-injector-1 test-json-injector-1.o
+	$(CC) -L.. -lcog-utils -o test-json-injector test-json-injector.o
+	$(CC) -L.. -lcog-utils -o test-json-string test-json-string.o
+	$(CC) -L.. -lcog-utils -o test-logconf test-logconf.o
+	$(CC) -L.. -lcog-utils -o test-ns test-ns.o
+	$(CC) -L.. -lcog-utils -o test-ntl test-ntl.o
+	$(CC) -L.. -lcog-utils -o test-spec test-spec.o

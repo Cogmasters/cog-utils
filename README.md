@@ -13,3 +13,5 @@ https://github.com/cantora/avr-crypto-lib
 
 A really simple C unit test framework:
 https://github.com/silentbicycle/greatest
+
+Requires BSD Make.
