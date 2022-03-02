@@ -6,9 +6,75 @@ extern "C" {
 #endif /* __cplusplus */
 
 #include <stdint.h> /* uint64_t */
-#include "ntl.h" /* struct sized_buffer */
+
 #include "log.h"
-#include "debug.h"
+#include "cog-utils.h"
+
+#define __ERR(fmt, ...) log_fatal(fmt "%s", __VA_ARGS__)
+
+# define ERR(...)                                                             \
+  do {                                                                        \
+    __ERR(__VA_ARGS__, "");                                                   \
+    abort();                                                                  \
+  } while (0)
+
+#define ASSERT_S(expr, msg)                                                   \
+  do {                                                                        \
+    if (!(expr)) {                                                            \
+      ERR(ANSICOLOR("\n\tAssert Failed", ANSI_FG_RED)":\t%s\n\t"              \
+          ANSICOLOR("Expected", ANSI_FG_RED)":\t"msg, #expr);                 \
+    }                                                                         \
+  } while (0)
+
+/* THIS WILL ONLY WORK IF __VA_ARGS__ IS SET */
+# define VASSERT_S(expr, fmt, ...)                                            \
+  do {                                                                        \
+    if (!(expr)) {                                                            \
+      ERR(ANSICOLOR("\n\tAssert Failed", ANSI_FG_RED)":\t"fmt"\n\t"           \
+          ANSICOLOR("Expected", ANSI_FG_RED)":\t %s", __VA_ARGS__, #expr);    \
+    }                                                                         \
+  } while (0)
+
+/* Encode a string with ANSI color */
+#ifdef LOG_USE_COLOR
+# define ANSICOLOR(str, color) "\x1b[" color "m" str "\x1b[0m"
+#else
+# define ANSICOLOR(str, color) str
+#endif
+
+#define ANSI_FG_BLACK          "30"
+#define ANSI_FG_RED            "31"
+#define ANSI_FG_GREEN          "32"
+#define ANSI_FG_YELLOW         "33"
+#define ANSI_FG_BLUE           "34"
+#define ANSI_FG_MAGENTA        "35"
+#define ANSI_FG_CYAN           "36"
+#define ANSI_FG_WHITE          "37"
+#define ANSI_FG_GRAY           "90"
+#define ANSI_FG_BRIGHT_RED     "91"
+#define ANSI_FG_BRIGHT_GREEN   "92"
+#define ANSI_FG_BRIGHT_YELLOW  "93"
+#define ANSI_FG_BRIGHT_BLUE    "94"
+#define ANSI_FG_BRIGHT_MAGENTA "95"
+#define ANSI_FG_BRIGHT_CYAN    "96"
+#define ANSI_FG_BRIGHT_WHITE   "97"
+
+#define ANSI_BG_BLACK          "40"
+#define ANSI_BG_RED            "41"
+#define ANSI_BG_GREEN          "42"
+#define ANSI_BG_YELLOW         "43"
+#define ANSI_BG_BLUE           "44"
+#define ANSI_BG_MAGENTA        "45"
+#define ANSI_BG_CYAN           "46"
+#define ANSI_BG_WHITE          "47"
+#define ANSI_BG_GRAY           "100"
+#define ANSI_BG_BRIGHT_RED     "101"
+#define ANSI_BG_BRIGHT_GREEN   "102"
+#define ANSI_BG_BRIGHT_YELLOW  "103"
+#define ANSI_BG_BRIGHT_BLUE    "104"
+#define ANSI_BG_BRIGHT_MAGENTA "105"
+#define ANSI_BG_BRIGHT_CYAN    "106"
+#define ANSI_BG_BRIGHT_WHITE   "107"
 
 /** @defgroup Log_C_Datatypes
  * @brief Relevant datatypes borrowed from `log.c`
@@ -33,7 +99,7 @@ extern "C" {
  * @param ... the printf-like format string and successive arguments
  */
 #define logconf_trace(conf, ...)                                              \
-  logconf_log(conf, LOG_TRACE, __FILE__, __LINE__, __VA_ARGS__)
+    logconf_log(conf, LOG_TRACE, __FILE__, __LINE__, __VA_ARGS__)
 /**
  * @brief Log level debug
  *
@@ -41,7 +107,7 @@ extern "C" {
  * @param ... the printf-like format string and successive arguments
  */
 #define logconf_debug(conf, ...)                                              \
-  logconf_log(conf, LOG_DEBUG, __FILE__, __LINE__, __VA_ARGS__)
+    logconf_log(conf, LOG_DEBUG, __FILE__, __LINE__, __VA_ARGS__)
 /**
  * @brief Log level info
  *
@@ -49,7 +115,7 @@ extern "C" {
  * @param ... the printf-like format string and successive arguments
  */
 #define logconf_info(conf, ...)                                               \
-  logconf_log(conf, LOG_INFO, __FILE__, __LINE__, __VA_ARGS__)
+    logconf_log(conf, LOG_INFO, __FILE__, __LINE__, __VA_ARGS__)
 /**
  * @brief Log level warn
  *
@@ -57,7 +123,7 @@ extern "C" {
  * @param ... the printf-like format string and successive arguments
  */
 #define logconf_warn(conf, ...)                                               \
-  logconf_log(conf, LOG_WARN, __FILE__, __LINE__, __VA_ARGS__)
+    logconf_log(conf, LOG_WARN, __FILE__, __LINE__, __VA_ARGS__)
 /**
  * @brief Log level error
  *
@@ -65,7 +131,7 @@ extern "C" {
  * @param ... the printf-like format string and successive arguments
  */
 #define logconf_error(conf, ...)                                              \
-  logconf_log(conf, LOG_ERROR, __FILE__, __LINE__, __VA_ARGS__)
+    logconf_log(conf, LOG_ERROR, __FILE__, __LINE__, __VA_ARGS__)
 /**
  * @brief Log level fatal
  *
@@ -73,12 +139,12 @@ extern "C" {
  * @param ... the printf-like format string and successive arguments
  */
 #define logconf_fatal(conf, ...)                                              \
-  logconf_log(conf, LOG_FATAL, __FILE__, __LINE__, __VA_ARGS__)
+    logconf_log(conf, LOG_FATAL, __FILE__, __LINE__, __VA_ARGS__)
 
 /* helper function for logconf_log() */
 #define __logconf_log(conf, level, file, line, fmt, ...)                      \
-  _log_log(&(conf)->L, level, file, line, "[%s] " fmt "%s", (conf)->id,       \
-           __VA_ARGS__)
+    _log_log(&(conf)->L, level, file, line, "[%s] " fmt "%s", (conf)->id,     \
+             __VA_ARGS__)
 /**
  * @brief Run-time configurable log level
  *
@@ -89,7 +155,7 @@ extern "C" {
  * @param ... the printf-like format string and successive arguments
  */
 #define logconf_log(conf, level, file, line, ...)                             \
-  __logconf_log(conf, level, file, line, __VA_ARGS__, "")
+    __logconf_log(conf, level, file, line, __VA_ARGS__, "")
 
 /** Maximum length for module id */
 #define LOGCONF_ID_LEN 64 + 1
@@ -105,32 +171,35 @@ extern "C" {
  * branching.
  */
 struct logconf {
-  /** logging module id */
-  char id[LOGCONF_ID_LEN];
-  /** log.c main structure */
-  log_Logger L;
-  /** the id of the process where this module was created */
-  unsigned pid;
-  /** if true then logconf_cleanup() won't cleanup shared resources */
-  _Bool is_branch;
-  /** config file conents */
-  struct sized_buffer file;
-  struct {
-    /** name of logging output file */
-    char fname[LOGCONF_PATH_MAX];
-    /** pointer to logging output file */
-    FILE *f;
-  } * logger, *http;
-  /** list of 'id' that should be ignored */
-  NTL_T(struct ja_str) disable_modules;
+    /** logging module id */
+    char id[LOGCONF_ID_LEN];
+    /** log.c main structure */
+    log_Logger L;
+    /** the id of the process where this module was created */
+    unsigned pid;
+    /** if true then logconf_cleanup() won't cleanup shared resources */
+    _Bool is_branch;
+    /** config file conents */
+    struct sized_buffer file;
+    struct {
+        /** name of logging output file */
+        char fname[LOGCONF_PATH_MAX];
+        /** pointer to logging output file */
+        FILE *f;
+    } * logger, *http;
+    /** list of 'id' that should be ignored */
+    struct {
+        size_t size;
+        char **ids;
+    } disable_modules;
 };
 
 /** @brief Store logging information from log_http() */
 struct loginfo {
-  /** log count */
-  size_t counter;
-  /** log timestamp */
-  uint64_t tstamp_ms;
+    /** log count */
+    size_t counter;
+    /** log timestamp */
+    uint64_t tstamp_ms;
 };
 
 /**
@@ -171,11 +240,14 @@ void logconf_cleanup(struct logconf *conf);
  * @brief Get the value from a given JSON field of the config file
  *
  * @param conf the `struct logconf` module
- * @param json_field the field to fetch the value of
+ * @param path the JSON key path
+ * @param depth the path depth
  * @return a read-only sized buffer containing the field's value
  * @see logconf_setup() for initializing `conf` with a config file
  */
-struct sized_buffer logconf_get_field(struct logconf *conf, char *json_field);
+struct sized_buffer logconf_get_field(struct logconf *conf,
+                                      char *const path[],
+                                      int depth);
 
 /**
  * @brief Log HTTP transfers

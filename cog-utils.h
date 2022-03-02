@@ -4,53 +4,23 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "ntl.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
 /**
- * @brief Compare equality between two strings
+ * @brief Sized buffer
  *
- * 1 if strings are equal, 0 otherwise
- * @param str1 first string
- * @param str2 second string
+ * A very important data structure that is used
+ * pervasively in the conversion between JSON strings and C structs,
+ * http request/response body
  */
-#define STREQ(str1, str2) (0 == strcmp(str1, str2))
-/**
- * @brief Compare equality between two strings up to n characters
- *
- * 1 if strings are equal, 0 otherwise
- * @param str1 first string
- * @param str2 second string
- * @param n length of characters to compare
- */
-#define STRNEQ(str1, str2, n) (0 == strncmp(str1, str2, n))
-/**
- * @brief Check if string pointer is an empty string
- *
- * @param str the string pointer to be checked
- */
-#define IS_EMPTY_STRING(str) (!(str) || !*(str))
-/**
- * @brief Return enumerator token as a string if there's a switch match
- *
- * @param opcode the enumerator to be checked against
- * @return opcode as a string if there's a match
- */
-#define CASE_RETURN_STR(opcode)                                               \
-  case opcode:                                                                \
-    return #opcode
-/**
- * @brief Return enum value if string matches enum token
- *
- * @param enum enumerator token to be compared against `str`
- * @param str a string to be compared against the `enum` token
- * @return enum opcode if there's a match
- */
-#define STREQ_RETURN_ENUM(enum, str)                                          \
-  if (STREQ(#enum, str)) return enum
+struct sized_buffer {
+    /** the buffer's start */
+    char *start;
+    /** the buffer's size in bytes */
+    size_t size;
+};
 
 /**
  * @brief Load file contents into a string
@@ -92,10 +62,11 @@ int cog_dati_from_fjson(char filename[],
  * @param str the JSON string
  * @param len the JSON string length
  * @param buf the sized buffer
+ * @return amount of bytes written to buf
  */
-void cog_sized_buffer_from_json(char *str,
-                                size_t len,
-                                struct sized_buffer *buf);
+size_t cog_sized_buffer_from_json(const char str[],
+                                  size_t len,
+                                  struct sized_buffer *buf);
 
 /**
  * @brief Get the difference between UTC and the latest local standard time, in
@@ -108,23 +79,23 @@ long cog_timezone(void);
  * @brief Convert a iso8601 string to a unix timestamp (milliseconds)
  *
  * Can be matched to the json_extract() and json_inject() %F specifier
- * @param timestamp the iso8601 string timestamp
+ * @param str the iso8601 string timestamp
  * @param len the string length
  * @param p_value pointer to the `uint64_t` variable to receive the converted
  * timestamp
  * @return 1 on success, 0 on failure
  */
-int cog_iso8601_to_unix_ms(char *timestamp, size_t len, uint64_t *p_value);
+int cog_iso8601_to_unix_ms(const char str[], size_t len, uint64_t *p_value);
 
 /**
  * @brief Convert a unix timestamp (milliseconds) to a iso8601 string
  *
- * @param str the buffer to receive the converted timestamp
+ * @param timestamp the buffer to receive the converted timestamp
  * @param len the size of the buffer
- * @param p_value the unix timestamp to be converted to iso8601
+ * @param value the unix timestamp to be converted to iso8601
  * @return the amount of characters (in bytes) written to the buffer
  */
-int cog_unix_ms_to_iso8601(char *str, size_t len, uint64_t *p_value);
+int cog_unix_ms_to_iso8601(char str[], size_t len, const uint64_t value);
 
 /**
  * @brief Convert a numerical string to `uint64_t`
@@ -156,7 +127,7 @@ int cog_u64tostr(char *str, size_t len, uint64_t *p_value);
  * @param p_dest a pointer to the new `src` copy
  * @return length of copied string on success, 0 on failure
  */
-size_t cog_strndup(const char *src, size_t len, char **p_dest);
+size_t cog_strndup(const char src[], size_t len, char **p_dest);
 
 /**
  * @brief Copies at most `len` bytes of `src` to `*p_dest`.
@@ -193,22 +164,6 @@ uint64_t cog_timestamp_ms(void);
  *        string length is greater than threshold
  */
 size_t cog_str_bounds_check(const char *str, const size_t threshold_len);
-
-/**
- * @brief Concatenate an array of strings to a buffer
- *
- * @param strings the array of strings
- * @param nmemb amount of elements in the array
- * @param delim arbitrary delimiter for separating strings
- * @param wordlen maximum length supported for each string
- * @param maxlen maximum length supported for resulting buffer
- * @return the buffer of concatenated strings
- */
-char *cog_join_strings(char **strings,
-                       const size_t nmemb,
-                       const char delim[],
-                       const size_t wordlen,
-                       const size_t maxlen);
 
 #ifdef __cplusplus
 }

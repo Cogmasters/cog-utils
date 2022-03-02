@@ -1,8 +1,8 @@
-CC=cc
-AR=ar
-OBJS=cog-utils.o json-actor.o log.o ntl.o json-actor-boxed.o json-string.o \
-     logconf.o specs-gen.o
-LIBS=libcogutils.a
+CC = cc
+AR = ar
+
+OBJS = cog-utils.o log.o logconf.o jsmn-find.o json-build.o
+LIBS = libcogutils.a
 
 .SUFFIXES: .c .o
 

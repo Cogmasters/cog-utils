@@ -4,7 +4,8 @@
 
 #define CONFIG_FILE "test-logconf.json"
 
-int main(void)
+int
+main(void)
 {
   FILE *fp = fopen(CONFIG_FILE, "rb");
 
@@ -15,7 +16,8 @@ int main(void)
   logconf_branch(&confC, &confA, "BRANCH C");
 
   /* get some JSON field written in .config file */
-  struct sized_buffer level = logconf_get_field(&confA, "logging.level");
+  struct sized_buffer level =
+    logconf_get_field(&confA, (char *[]){ "logging", "level" }, 2);
   logconf_trace(&confA, "Logging level: %.*s", (int)level.size, level.start);
 
   /* test each conf */
@@ -24,29 +26,14 @@ int main(void)
   logconf_fatal(&confC, "C");
 
   /* print to 'logging.filename' (@todo better function name?) */
-  logconf_http(
-    &confA, 
-    NULL,
-    "TITLE1", 
-    (struct sized_buffer){"HEADER_A", 8},
-    (struct sized_buffer){"BODY_A", 6},
-    "%s", "Hello");
+  logconf_http(&confA, NULL, "TITLE1", (struct sized_buffer){ "HEADER_A", 8 },
+               (struct sized_buffer){ "BODY_A", 6 }, "%s", "Hello");
 
-  logconf_http(
-    &confB, 
-    NULL,
-    "TITLE2", 
-    (struct sized_buffer){"HEADER_B", 8},
-    (struct sized_buffer){"BODY_B", 6},
-    "%d", 1337);
+  logconf_http(&confB, NULL, "TITLE2", (struct sized_buffer){ "HEADER_B", 8 },
+               (struct sized_buffer){ "BODY_B", 6 }, "%d", 1337);
 
-  logconf_http(
-    &confC, 
-    NULL,
-    "TITLE3", 
-    (struct sized_buffer){"HEADER_C", 8},
-    (struct sized_buffer){"BODY_C", 6},
-    "%c", '7');
+  logconf_http(&confC, NULL, "TITLE3", (struct sized_buffer){ "HEADER_C", 8 },
+               (struct sized_buffer){ "BODY_C", 6 }, "%c", '7');
 
   /* cleanup conf resources */
   logconf_cleanup(&confA);

@@ -13,7 +13,6 @@
 #include <unistd.h>
 
 #include "cog-utils.h"
-#include "debug.h"
 #include "clock.h"
 
 char *
@@ -37,32 +36,19 @@ char *
 cog_load_whole_file(const char filename[], size_t *len)
 {
   FILE *fp = fopen(filename, "rb");
-  VASSERT_S(NULL != fp, "%s '%s'\n", strerror(errno), filename);
+  if (!fp) {
+      fprintf(stderr, "%s '%s'\n", strerror(errno), filename);
+      return NULL;
+  }
   char *str = cog_load_whole_file_fp(fp, len);
   fclose(fp);
   return str;
 }
 
-int
-cog_dati_from_fjson(char filename[],
-                    void *p_data,
-                    void(from_json_cb)(char *str, size_t len, void *p_data))
+size_t
+cog_sized_buffer_from_json(const char str[], size_t len, struct sized_buffer *buf)
 {
-  size_t len;
-  char *json = cog_load_whole_file(filename, &len);
-  if (NULL == json) return 0;
-
-  from_json_cb(json, len, p_data);
-
-  free(json);
-
-  return 1;
-}
-
-void
-cog_sized_buffer_from_json(char *str, size_t len, struct sized_buffer *buf)
-{
-  buf->size = cog_strndup(str, len, &buf->start);
+  return buf->size = cog_strndup(str, len, &buf->start);
 }
 
 long
@@ -93,7 +79,7 @@ cog_timezone(void)
 }
 
 int
-cog_iso8601_to_unix_ms(char *str, size_t len, uint64_t *p_value)
+cog_iso8601_to_unix_ms(const char str[], size_t len, uint64_t *p_value)
 {
   double seconds = 0.0;
   int tz_operator = 'Z';
@@ -128,10 +114,10 @@ cog_iso8601_to_unix_ms(char *str, size_t len, uint64_t *p_value)
 }
 
 int
-cog_unix_ms_to_iso8601(char *str, size_t len, uint64_t *p_value)
+cog_unix_ms_to_iso8601(char *str, size_t len, uint64_t value)
 {
-  time_t seconds = (*p_value / 1000) - cog_timezone();
-  int millis = *p_value % 1000;
+  time_t seconds = (value / 1000) - cog_timezone();
+  int millis = value % 1000;
   struct tm *tm = localtime(&seconds);
 
   return snprintf(
@@ -158,7 +144,7 @@ cog_u64tostr(char *str, size_t len, uint64_t *p_value)
 }
 
 size_t
-cog_strndup(const char *src, size_t len, char **p_dest)
+cog_strndup(const char src[], size_t len, char **p_dest)
 {
   *p_dest = malloc(len + 1);
 
@@ -253,26 +239,4 @@ cog_str_bounds_check(const char *str, const size_t threshold_len)
     if ('\0' == str[i]) return i; /* bound check succeeded */
   }
   return 0; /* bound check failed */
-}
-
-char *
-cog_join_strings(char **strings,
-                 const size_t nmemb,
-                 const char delim[],
-                 const size_t wordlen,
-                 const size_t maxlen)
-{
-  char *buf = malloc(maxlen);
-  char *cur = buf, *const end = cur + maxlen;
-  size_t i;
-
-  for (i = 0; i < nmemb; ++i) {
-    VASSERT_S(cog_str_bounds_check(strings[i], wordlen) > 0,
-              "'%s' exceeds threshold of %zu characters", strings[i], wordlen);
-    cur += snprintf(cur, end - cur, "%s%s", strings[i], delim);
-    ASSERT_S(cur < end, "Out of bounds write attempt");
-  }
-  *(cur - strlen(delim)) = '\0';
-
-  return buf;
 }
