@@ -1,3 +1,4 @@
+*.a
 *.o
 *.log
 portable_snippets
