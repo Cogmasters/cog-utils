@@ -162,7 +162,7 @@ extern "C" {
 
 /* helper function for logconf_log() */
 #define __logconf_log(conf, level, file, line, fmt, ...)                      \
-    _log_log((conf)->L, level, file, line, "[%-15s] " fmt "%s", (conf)->id,   \
+    _log_log((conf)->L, level, file, line, "[%s] " fmt "%s", (conf)->id,      \
              __VA_ARGS__)
 /**
  * @brief Run-time configurable log level

@@ -96,7 +96,7 @@ cog_iso8601_to_unix_ms(const char str[], size_t len, uint64_t *p_value)
   tm.tm_year -= 1900; /* struct tm takes years from 1900 */
 
   *p_value = (((uint64_t)mktime(&tm) + cog_timezone()) * 1000)
-             + (uint64_t)seconds * 1000.0;
+             + (uint64_t)(seconds * 1000.0);
 
   switch (tz_operator) {
   case '+': /* Add hours and minutes */
@@ -222,6 +222,17 @@ cog_timestamp_ms(void)
   struct PsnipClockTimespec t;
   if (0 == psnip_clock_get_time(PSNIP_CLOCK_TYPE_WALL, &t)) {
     return (uint64_t)t.seconds * 1000 + (uint64_t)t.nanoseconds / 1000000;
+  }
+  return 0;
+}
+
+/* returns current timestamp in microseconds */
+uint64_t
+cog_timestamp_us(void)
+{
+  struct PsnipClockTimespec t;
+  if (0 == psnip_clock_get_time(PSNIP_CLOCK_TYPE_WALL, &t)) {
+    return (uint64_t)t.seconds * 1000000 + (uint64_t)t.nanoseconds / 1000;
   }
   return 0;
 }
