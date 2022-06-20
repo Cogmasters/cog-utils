@@ -1,17 +1,16 @@
 TOP = ..
+CC  = cc
 
-CC = cc
-
-OBJS  = test-logconf.o
-PROGS = test-logconf
+TESTS =
 
 CFLAGS = -I$(TOP) -g
-LFLAGS = -L$(TOP) -lcogutils
 
-.SUFFIXES: .c .o
+LDFLAGS = -L$(TOP)
+LDLIBS  = -lcog-utils
 
-.c.o:
-	$(CC) $(CFLAGS) -c $<
+all: $(TESTS)
 
-$(PROGS): $(OBJS)
-	$(CC) $(CFLAGS) -o test-logconf test-logconf.o $(LFLAGS)
+clean:
+	@ $(RM) $(TESTS)
+
+.PHONY: clean

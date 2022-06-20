@@ -2,5 +2,6 @@
 *
 # But these
 !.gitignore
+!greatest.h
 !*.c
 !Makefile

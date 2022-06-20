@@ -9,20 +9,6 @@ extern "C" {
 #endif /* __cplusplus */
 
 /**
- * @brief Sized buffer
- *
- * A very important data structure that is used
- * pervasively in the conversion between JSON strings and C structs,
- * http request/response body
- */
-struct sized_buffer {
-    /** the buffer's start */
-    char *start;
-    /** the buffer's size in bytes */
-    size_t size;
-};
-
-/**
  * @brief Load file contents into a string
  *
  * @param fp the file to be read
@@ -40,33 +26,6 @@ char *cog_load_whole_file_fp(FILE *fp, size_t *len);
  * @return the file contents
  */
 char *cog_load_whole_file(const char filename[], size_t *len);
-
-/**
- * @brief Fill a structure from a JSON file
- *
- * @param filename the name of the JSON file to be read
- * @param p_data a pointer to the structure to be filled
- * @param from_json_cb the callback that will receive the JSON data
- *        and then fill the structure
- * @return 1 on success, 0 on failure
- */
-int cog_dati_from_fjson(char filename[],
-                        void *p_data,
-                        void(from_json_cb)(char *str,
-                                           size_t len,
-                                           void *p_data));
-
-/**
- * @brief Create a copy of JSON string to a `struct sized_buffer`
- *
- * @param str the JSON string
- * @param len the JSON string length
- * @param buf the sized buffer
- * @return amount of bytes written to buf
- */
-size_t cog_sized_buffer_from_json(const char str[],
-                                  size_t len,
-                                  struct sized_buffer *buf);
 
 /**
  * @brief Get the difference between UTC and the latest local standard time, in
@@ -141,12 +100,21 @@ size_t cog_strndup(const char src[], size_t len, char **p_dest);
 size_t cog_asprintf(char **strp, const char fmt[], ...);
 
 /**
- * @brief Sleep for milliseconds amount
+ * @brief Sleep for amount of milliseconds
  *
- * @param tms milliseconds amount to sleep for
+ * @param tms amount of milliseconds to sleep for
  * @return 0 on success, -1 on error with an `errno` set to indicate the error
  */
 int cog_sleep_ms(const long tms);
+
+
+/**
+ * @brief Sleep for amount of microseconds
+ *
+ * @param tms amount of microseconds to sleep for
+ * @return 0 on success, -1 on error with an `errno` set to indicate the error
+ */
+int cog_sleep_us(const long tms);
 
 /**
  * @brief Get the current timestamp in milliseconds
@@ -161,16 +129,6 @@ uint64_t cog_timestamp_ms(void);
  * @return the timestamp on success, 0 on failure
  */
 uint64_t cog_timestamp_us(void);
-
-/**
- * @brief Check if arbitrary string length is exceeded
- *
- * @param str the string to be checked
- * @param threshold_len maximum length for success
- * @return the string length on success, SIZE_MAX on `NULL` string, and 0 if
- *        string length is greater than threshold
- */
-size_t cog_str_bounds_check(const char *str, const size_t threshold_len);
 
 #ifdef __cplusplus
 }

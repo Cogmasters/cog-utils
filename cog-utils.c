@@ -45,12 +45,6 @@ cog_load_whole_file(const char filename[], size_t *len)
   return str;
 }
 
-size_t
-cog_sized_buffer_from_json(const char str[], size_t len, struct sized_buffer *buf)
-{
-  return buf->size = cog_strndup(str, len, &buf->start);
-}
-
 long
 cog_timezone(void)
 {
@@ -215,6 +209,40 @@ cog_sleep_ms(const long tms)
   return ret;
 }
 
+int
+cog_sleep_us(const long tms)
+{
+  int ret;
+
+#if _POSIX_C_SOURCE >= 199309L
+  struct timespec ts;
+
+  if (tms < 0) {
+    errno = EINVAL;
+    return -1;
+  }
+
+  ts.tv_sec = tms / 1000000;
+  ts.tv_nsec = (tms % 1000000) * 1000;
+
+  do {
+    ret = nanosleep(&ts, &ts);
+  } while (ret && errno == EINTR);
+#else
+  struct timeval timeout;
+  long _tms = tms;
+
+  timeout.tv_sec = _tms / 1000000L;
+  _tms = tms % 1000000L;
+  timeout.tv_usec = (int)_tms;
+  select(0, NULL, NULL, NULL, &timeout);
+
+  ret = 0;
+#endif
+
+  return ret;
+}
+
 /* returns current timestamp in milliseconds */
 uint64_t
 cog_timestamp_ms(void)
@@ -235,19 +263,4 @@ cog_timestamp_us(void)
     return (uint64_t)t.seconds * 1000000 + (uint64_t)t.nanoseconds / 1000;
   }
   return 0;
-}
-
-/* this can be used for checking if a user-given string does not
- *  exceeds a arbitrary threshold length */
-size_t
-cog_str_bounds_check(const char *str, const size_t threshold_len)
-{
-  size_t i;
-
-  if (!str) return SIZE_MAX; /* Missing string */
-
-  for (i = 0; i < threshold_len; ++i) {
-    if ('\0' == str[i]) return i; /* bound check succeeded */
-  }
-  return 0; /* bound check failed */
 }

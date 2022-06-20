@@ -1,20 +1,16 @@
 CC = cc
-AR = ar
 
-OBJS = cog-utils.o log.o logconf.o jsmn-find.o json-build.o
-LIBS = libcogutils.a
+OBJS = cog-utils.o
 
-.SUFFIXES: .c .o
+ARLIB   = libcog-utils.a
+ARFLAGS = -cqsv
 
-.c.o:
-	$(CC) -c $< 
+all: $(ARLIB)
 
-all: $(LIBS)
-
-$(LIBS): $(OBJS)
-	$(AR) cr libcogutils.a $(OBJS)
-
-.PHONY: clean
+$(ARLIB): $(OBJS)
+	$(AR) $(ARFLAGS) $@ $<
 
 clean:
-	rm -rf $(LIBS) $(OBJS)
+	@ $(RM) $(ARLIB) $(OBJS)
+
+.PHONY: clean
