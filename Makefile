@@ -8,9 +8,9 @@ ARFLAGS = -cqsv
 all: $(ARLIB)
 
 $(ARLIB): $(OBJS)
-	$(AR) $(ARFLAGS) $@ $<
+	$(AR) $(ARFLAGS) $@ $(OBJS)
 
 clean:
-	@ $(RM) $(ARLIB) $(OBJS)
+	@ rm -f $(ARLIB) $(OBJS)
 
 .PHONY: clean

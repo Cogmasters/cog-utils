@@ -1,5 +1,5 @@
 TOP = ..
-CC  = cc
+CC ?= gcc
 
 TESTS =
 
@@ -11,6 +11,6 @@ LDLIBS  = -lcog-utils
 all: $(TESTS)
 
 clean:
-	@ $(RM) $(TESTS)
+	@ rm -f $(TESTS)
 
 .PHONY: clean
